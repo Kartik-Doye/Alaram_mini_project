@@ -1,0 +1,34 @@
+git status
+git config --global user.name
+git config --global user.name smartrbo
+git config --global user.email
+git config --global user.name kunalappa523@gmail.com
+git status
+git add -A 
+git commit -m "analysis"
+git log
+git branch UI
+git branch
+git checkout Ui
+touch Design.txt
+git add Design.txt
+git commit -m "ui design completed"
+git log
+
+git checkout master
+git log
+git merge UI
+git log
+
+git branch frontend
+git checkout frontend
+git log
+touch html.txt
+git add -A
+git commit -m " front end com" 
+git log 
+git checkout master
+git merge frontend
+
+git log
+
