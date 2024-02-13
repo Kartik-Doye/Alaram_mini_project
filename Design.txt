@@ -1,0 +1,220 @@
+HTML CODE : 
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Old Times Alarm Clock</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="clock-container">
+        <div class="digital-clock">
+          <h1 id="digitalClock">00:00:00 AM</h1>
+        </div>
+        <div class="analog-clock">
+          <!-- Analog clock elements go here -->
+        </div>
+      </div>
+      <div class="content">
+        <div class="column">
+          <select>
+            <option value="Hour" selected disabled hidden>Hour</option>
+          </select>
+        </div>
+        <div class="column">
+          <select>
+            <option value="Minute" selected disabled hidden>Minute</option>
+          </select>
+        </div>
+        <div class="column">
+          <select>
+            <option value="AM/PM" selected disabled hidden>AM/PM</option>
+          </select>
+        </div>
+      </div>
+      <button id="setAlarmBtn">Set Alarm</button>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
+
+CSS Code : 
+
+
+
+
+/* Import Google font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  min-height: 100vh;
+  background: linear-gradient(to right, #2c3e50, #3498db);
+}
+
+.wrapper {
+  width: 440px;
+  padding: 30px 30px 38px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.clock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.digital-clock {
+  margin-bottom: 20px;
+}
+
+.digital-clock h1 {
+  font-size: 38px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 15px 0;
+}
+
+.content, .content.disable {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.content.disable {
+  cursor: no-drop;
+}
+
+.column {
+  padding: 0 10px;
+  border-radius: 5px;
+  border: 1px solid #bdc3c7;
+  width: calc(100% / 3 - 5px);
+  background: #ecf0f1;
+}
+
+.content.disable .column {
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.column select {
+  width: 100%;
+  height: 50px;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 18px;
+  color: #34495e;
+}
+
+button {
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 15px 0;
+  margin-top: 20px;
+  border-radius: 5px;
+  background: #2ecc71;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #27ae60;
+}
+
+
+
+JavaScripts Code : 
+
+
+
+const currentTime = document.querySelector("h1"),
+  content = document.querySelector(".content"),
+  selectMenu = document.querySelectorAll("select"),
+  setAlarmBtn = document.getElementById("setAlarmBtn");
+
+let alarmTime, isAlarmSet,
+  ringtone = new Audio("./files/ringtone.mp3");
+
+// Generating options for Hour, Minute, and AM/PM
+function generateOptions(start, end, target) {
+  for (let i = start; i <= end; i++) {
+    let formattedValue = i < 10 ? `0${i}` : `${i}`;
+    let option = `<option value="${formattedValue}">${formattedValue}</option>`;
+    target.firstElementChild.insertAdjacentHTML("afterend", option);
+  }
+}
+
+generateOptions(1, 12, selectMenu[0]); // Hours
+generateOptions(0, 59, selectMenu[1]); // Minutes
+
+// AM/PM Options
+let ampmOptions = ["AM", "PM"];
+for (let option of ampmOptions) {
+  let formattedOption = `<option value="${option}">${option}</option>`;
+  selectMenu[2].firstElementChild.insertAdjacentHTML("afterend", formattedOption);
+}
+
+setInterval(() => {
+  let date = new Date(),
+    h = date.getHours(),
+    m = date.getMinutes(),
+    s = date.getSeconds(),
+    ampm = h >= 12 ? "PM" : "AM";
+
+  h = h % 12 || 12;
+  h = h < 10 ? `0${h}` : h;
+  m = m < 10 ? `0${m}` : m;
+  s = s < 10 ? `0${s}` : s;
+
+  currentTime.innerText = `${h}:${m}:${s} ${ampm}`;
+
+  if (alarmTime === `${h}:${m} ${ampm}`) {
+    ringtone.play();
+    ringtone.loop = true;
+  }
+});
+
+function setAlarm() {
+  if (isAlarmSet) {
+    alarmTime = "";
+    ringtone.pause();
+    content.classList.remove("disable");
+    setAlarmBtn.innerText = "Set Alarm";
+    return isAlarmSet = false;
+  }
+
+  let time = `${selectMenu[0].value}:${selectMenu[1].value} ${selectMenu[2].value}`;
+  if (time.includes("Hour") || time.includes("Minute") || time.includes("AM/PM")) {
+    return alert("Please, select a valid time to set Alarm!");
+  }
+
+  alarmTime = time;
+  isAlarmSet = true;
+  content.classList.add("disable");
+  setAlarmBtn.innerText = "Clear Alarm";
+}
+
+setAlarmBtn.addEventListener("click", setAlarm);
